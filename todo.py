@@ -34,16 +34,22 @@ class TodoModel(QtCore.QAbstractListModel):
         # status changes based on completion
 
         if role == Qt.DisplayRole:
-            _, text = self.todos[index.row()] # get text (add ids?)
+            _, _, text = self.todos[index.row()] # get text (add ids?)
             return text 
         
         if role == Qt.DecorationRole:
-            status, _ = self.todos[index.row()] # get status
+            _, status, _ = self.todos[index.row()] # get status
             if status:
                 return tick # return checkmark image
 
     def rowCount(self, index): # return number of todoss
         return len(self.todos)
+
+    def colCount(self, index):
+        return max([indent_level for indent_level, _, _ in self.todos])
+
+    def indent_level(self, index):
+        return self.todos[index.row()][0]
 
 
 # Main window class
@@ -59,7 +65,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.deleteButton.pressed.connect(self.delete)
         self.completeButton.pressed.connect(self.complete)
 
-
         # styling
         with open('stylesheet.qss', 'r') as f:
             self.setStyleSheet(f.read())
@@ -72,10 +77,35 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             self.delete() 
         if event.key() == Qt.Key_Space: # doesnt work, maybe need to select item?
             self.complete()
+        if event.key() == Qt.Key_Right:
+            self.indent(self.todoView.selectedIndexes()[0]) # selected item is index arg
+        if event.key() == Qt.Key_Left:
+            self.outdent(self.todoView.selectedIndexes()[0])
 
     # add mouse events, draggable entries:
     def mousePressEvent(self, event):
         pass
+
+    def indent(self, index):
+        # this is dumb but we are just going to add 2 spaces to the beginning of text:
+        # unpack
+        indent_level, status, text = self.model.todos[index.row()]
+        # add 4 spaces to the beginning of text:
+        text = "    " + text
+        # add 1 to indent level
+        self.model.todos[index.row()] = (indent_level + 1, False, text)
+        self.model.layoutChanged.emit()
+        self.save()
+    
+    def outdent(self, index):
+        # remove 4 spaces
+        indent_level, status, text = self.model.todos[index.row()]
+        text = text[4:]
+        if indent_level == 0:
+            return
+        self.model.todos[index.row()] = (indent_level - 1, False, text)
+        self.model.layoutChanged.emit()
+        self.save()
 
 
     def add(self):
@@ -86,7 +116,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         text = self.todoEdit.text()
         if text: # Don't add empty strings.
             # Access the list via the model.
-            self.model.todos.append((False, text))
+            self.model.todos.append((0, False, text))
             # Trigger refresh.        
             self.model.layoutChanged.emit()
             # Empty the input
@@ -126,6 +156,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                 self.model.todos = json.load(f)
         except Exception:
             pass
+
     
     def save(self):
         with open('data.db', 'w') as f:

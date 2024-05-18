@@ -1,8 +1,10 @@
 import sys
+import os
 import json
 from PyQt5 import QtCore, QtGui, QtWidgets, uic
 from PyQt5.QtCore import Qt
 
+projects_dir = 'todoPyQt\projects'
 
 # =======================================================
 # TODO: 
@@ -55,11 +57,15 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         self.setupUi(self)
         self.model = TodoModel()
-        self.load()
+
+        self.load() # load all db files, stores in list
+
         self.todoView.setModel(self.model)
         self.addButton.pressed.connect(self.add)
         # self.deleteButton.pressed.connect(self.delete)
         # self.completeButton.pressed.connect(self.complete)
+        self.nextProjectButton.pressed.connect(self.next_project)
+        self.previousProjectButton.pressed.connect(self.previous_project)
 
         # styling
         with open('stylesheet.qss', 'r') as f:
@@ -71,8 +77,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             self.add()
         if event.key() == Qt.Key_Delete:
             self.delete() 
-        # if event.key() == Qt.Key_Space: # doesnt work, maybe need to select item?
-        #     self.complete()
         if event.key() == Qt.Key_Right:
             self.indent(self.todoView.selectedIndexes()[0]) # selected item is index arg
         if event.key() == Qt.Key_Left:
@@ -83,6 +87,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             self.move_up()
         if event.key() == QtCore.Qt.Key_S and modifiers == QtCore.Qt.ControlModifier:
             self.move_down()
+
+        if event.key() == QtCore.Qt.Key_C and modifiers == QtCore.Qt.ControlModifier:
+            self.complete()
 
 
 
@@ -175,17 +182,81 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             self.save()
     
     # opening, reading/writing to file:
+
     def load(self):
+
+        # load in config
+        print("Loading config...")
         try:
-            with open('data.db', 'r') as f:
-                self.model.todos = json.load(f)
+            if os.path.exists('config.json'):
+                with open('config.json', 'r') as config_file:
+                    self.config = json.load(config_file)
+            else:
+                # create default config if it doesn't exist
+                pass
         except Exception:
             pass
 
+        # print(self.config)
+        self.current_project = self.config.get('current_project')
+        # print(self.current_project)
+        # update titleLabel
+        self.titleLabel.setText(self.current_project)
+
+        print("Loading projects...")
+        try:
+            files = os.listdir('./projects')
+            self.files = files
+            # setup index for current project
+            if self.current_project:
+                self.current_project_index = files.index(self.current_project)
+                # print(self.current_project_index)
+            else:
+                self.current_project_index = 0
+        except Exception:
+            pass
+        
+        # load project
+        self.load_project(self.current_project_index)
+
+    def load_project(self, project_index):
+        # load project
+        with open(f'projects/{self.files[project_index]}', 'r') as f:
+            data = json.load(f)
+            self.model.todos = data
+            self.model.layoutChanged.emit()
+            self.titleLabel.setText(self.current_project)
+            print(f"Loading project {self.files[project_index]}")
+
+    def next_project(self):
+        self.current_project_index += 1
+        if self.current_project_index >= len(self.files):
+            self.current_project_index = 0
+        self.current_project = self.files[self.current_project_index]
+        self.load_project(self.current_project_index)
+        self.save()
+
+    def previous_project(self):
+        self.current_project_index -= 1
+        if self.current_project_index < 0:
+            self.current_project_index = len(self.files) - 1
+        self.current_project = self.files[self.current_project_index]
+        self.load_project(self.current_project_index)   
+        self.save()
     
     def save(self):
-        with open('data.db', 'w') as f:
+        print(self.current_project)
+        # save to current file loaded:
+        with open(f'projects/{self.files[self.current_project_index]}', 'w') as f:
             data = json.dump(self.model.todos, f)
+        # update config.json:
+        print("Saving config...")
+        try:    
+            with open('config.json', 'w') as config_file:
+                self.config['current_project'] = self.current_project
+                json.dump(self.config, config_file)
+        except Exception as e:
+            print(f"Error saving config: {e}")
 
 
 app = QtWidgets.QApplication(sys.argv)

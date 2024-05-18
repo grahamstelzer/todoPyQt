@@ -1,33 +1,33 @@
 /* Global styles */
 * {
-    font-family: Roboto, sans-serif;
+    font-family: Arial, sans-serif;
     font-size: 14px;
 }
 
 QWidget {
-    background-color: #F5DEB3; /* Light tan */
+    background-color: white;
     color: black;
 }
 
 QPushButton {
-    background-color: #666666;
+    background-color: black;
     color: white;
     border: none;
     padding: 5px 10px;
 }
 
 QListView {
-    background-color: #F5DEB3;
+    background-color: white;
     color: black;
 }
 
 QLineEdit {
-    background-color: #555555;
+    background-color: black;
     color: white;
     padding: 5px;
 }
 
 QMenuBar {
-    background-color: #222222;
+    background-color: black;
     color: white;
 }

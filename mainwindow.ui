@@ -1,71 +1,147 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>MainWindow</class>
- <widget class="QMainWindow" name="MainWindow">
-  <property name="geometry">
-   <rect>
-    <x>0</x>
-    <y>0</y>
-    <width>400</width>
-    <height>750</height>
-   </rect>
-  </property>
-  <property name="windowTitle">
-   <string>get that sht done brother</string>
-  </property>
-  <widget class="QWidget" name="centralwidget">
-   <layout class="QVBoxLayout" name="verticalLayout">
-    <item>
-     <widget class="QListView" name="todoView">
-      <property name="selectionMode">
-       <enum>QAbstractItemView::SingleSelection</enum>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QWidget" name="widget" native="true">
-      <layout class="QHBoxLayout" name="horizontalLayout">
-       <item>
-        <widget class="QPushButton" name="deleteButton">
-         <property name="text">
-          <string>Delete</string>
-         </property>
+    <class>MainWindow</class>
+    <widget class="QMainWindow" name="MainWindow">
+        <property name="geometry">
+            <rect>
+                <x>0</x>
+                <y>0</y>
+                <width>400</width>
+                <height>750</height>
+            </rect>
+        </property>
+
+        <property name="windowTitle">
+            <string>get that sht done brother</string>
+        </property>
+
+        <widget class="QWidget" name="centralwidget">
+            <layout class="QVBoxLayout" name="verticalLayout">
+                <item>
+                    <widget class="QListView" name="todoView">
+                        <property name="selectionMode">
+                            <enum>QAbstractItemView::SingleSelection</enum>
+                        </property>
+                        <property name="styleSheet">
+                            <string notr="true">background-color: #333333; color: #FFFFFF; opacity: 0.8; border-radius: 5px;</string>
+                        </property>
+                    </widget>
+                </item>
+                <item>
+                    <widget class="QWidget" name="widget" native="true">
+                        <layout class="QHBoxLayout" name="horizontalLayout">
+
+                            <!-- <item>
+                                <widget class="QPushButton" name="deleteButton">
+                                    <property name="text">
+                                        <string>Delete</string>
+                                    </property>
+                                </widget>
+                            </item> -->
+
+                            <!-- <item>
+                                <widget class="QPushButton" name="completeButton">
+                                    <property name="text">
+                                        <string>Complete</string>
+                                    </property>
+                                </widget>
+                            </item> -->
+
+                        </layout>
+                    </widget>
+                </item>
+
+                <!-- current project name -->
+                <item>
+                    <widget class="QLabel" name="titleLabel">
+                        <property name="text">
+                            <string>Project Name</string>
+                        </property>
+                        <property name="alignment">
+                            <set>Qt::AlignCenter</set>
+                        </property>
+                        <property name="styleSheet">
+                            <string notr="true">background-color: #333333; color: #FFFFFF; opacity: 0.8; border-radius: 5px;</string>
+                        </property>
+                        <property name="minimumSize">
+                            <size>
+                                <width>200</width>
+                                <height>30</height>
+                            </size>
+                        </property>
+                    </widget>
+                </item>
+
+                <!-- the thing you enter things into -->
+                <item>
+                    <widget class="QLineEdit" name="todoEdit">
+                        <property name="styleSheet">
+                            <string notr="true">background-color: #333333; color: #FFFFFF; opacity: 0.8; border-radius: 5px;</string>
+                        </property>
+                        <property name="minimumSize">
+                            <size>
+                                <width>200</width>
+                                <height>50</height>
+                            </size>
+                        </property>
+                    </widget>
+                </item>
+
+                <item>
+                    <widget class="QPushButton" name="addButton">
+                        <property name="text">
+                            <string>Add Todo</string>
+                        </property>
+                        <property name="styleSheet">
+                            <string notr="true">background-color: #333333; color: #FFFFFF; opacity: 0.8; border-radius: 5px;</string>
+                        </property>
+                    </widget>
+                </item>
+
+                <!-- Project Navigation -->
+                <item>
+                    <layout class="QHBoxLayout" name="projectNavigationLayout">
+
+                        <item>
+                            <widget class="QPushButton" name="previousProjectButton">
+                                <property name="text">
+                                    <string>bring it back</string>
+                                </property>
+                                <property name="styleSheet">
+                                    <string notr="true">background-color: #333333; color: #FFFFFF; opacity: 0.8; border-radius: 5px;</string>
+                                </property>
+                            </widget>
+                        </item>
+
+                        <item>
+                            <widget class="QPushButton" name="nextProjectButton">
+                                <property name="text">
+                                    <string>go next</string>
+                                </property>
+                                <property name="styleSheet">
+                                    <string notr="true">background-color: #333333; color: #FFFFFF; opacity: 0.8; border-radius: 5px;</string>
+                                </property>
+                            </widget>
+                        </item>
+
+                    </layout>
+                </item>
+            </layout>
         </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="completeButton">
-         <property name="text">
-          <string>Complete</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-    </item>
-    <item>
-     <widget class="QLineEdit" name="todoEdit"/>
-    </item>
-    <item>
-     <widget class="QPushButton" name="addButton">
-      <property name="text">
-       <string>Add Todo</string>
-      </property>
-     </widget>
-    </item>
-   </layout>
-  </widget>
-  <widget class="QMenuBar" name="menubar">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>275</width>
-     <height>22</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QStatusBar" name="statusbar"/>
- </widget>
- <resources/>
- <connections/>
+
+        <!-- <widget class="QMenuBar" name="menubar">
+            <property name="geometry">
+                <rect>
+                    <x>0</x>
+                    <y>0</y>
+                    <width>275</width>
+                    <height>22</height>
+                </rect>
+            </property>
+        </widget> -->
+
+    <widget class="QStatusBar" name="statusbar"/>
+    </widget>
+    <resources/>
+    <connections/>
 </ui>

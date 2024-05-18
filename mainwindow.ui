@@ -36,6 +36,9 @@
                                     <property name="text">
                                         <string>Delete</string>
                                     </property>
+                                    <property name="styleSheet">
+                                        <string notr="true">background-color: darkgreen; color: #FFFFFF; opacity: 0.8; border-radius: 5px;</string>
+                                    </property>
                                 </widget>
                             </item> -->
 
@@ -43,6 +46,9 @@
                                 <widget class="QPushButton" name="completeButton">
                                     <property name="text">
                                         <string>Complete</string>
+                                    </property>
+                                    <property name="styleSheet">
+                                        <string notr="true">background-color: darkgreen; color: #FFFFFF; opacity: 0.8; border-radius: 5px;</string>
                                     </property>
                                 </widget>
                             </item> -->
@@ -76,7 +82,7 @@
                 <item>
                     <widget class="QLineEdit" name="todoEdit">
                         <property name="styleSheet">
-                            <string notr="true">background-color: #333333; color: #FFFFFF; opacity: 0.8; border-radius: 5px;</string>
+                            <string notr="true">background-color: #444444; color: #FFFFFF; opacity: 0.8; border-radius: 5px;</string>
                         </property>
                         <property name="minimumSize">
                             <size>
@@ -93,7 +99,7 @@
                             <string>Add Todo</string>
                         </property>
                         <property name="styleSheet">
-                            <string notr="true">background-color: #333333; color: #FFFFFF; opacity: 0.8; border-radius: 5px;</string>
+                            <string notr="true">background-color: darkgreen; color: #FFFFFF; opacity: 0.8; border-radius: 5px;</string>
                         </property>
                     </widget>
                 </item>
@@ -108,7 +114,7 @@
                                     <string>bring it back</string>
                                 </property>
                                 <property name="styleSheet">
-                                    <string notr="true">background-color: #333333; color: #FFFFFF; opacity: 0.8; border-radius: 5px;</string>
+                                    <string notr="true">background-color: darkgreen; color: #FFFFFF; opacity: 0.8; border-radius: 5px;</string>
                                 </property>
                             </widget>
                         </item>
@@ -119,7 +125,7 @@
                                     <string>go next</string>
                                 </property>
                                 <property name="styleSheet">
-                                    <string notr="true">background-color: #333333; color: #FFFFFF; opacity: 0.8; border-radius: 5px;</string>
+                                    <string notr="true">background-color: darkgreen; color: #FFFFFF; opacity: 0.8; border-radius: 5px;</string>
                                 </property>
                             </widget>
                         </item>

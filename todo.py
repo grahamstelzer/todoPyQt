@@ -3,6 +3,8 @@ import os
 import json
 from PyQt5 import QtCore, QtGui, QtWidgets, uic
 from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QFontDatabase
+from PyQt5.QtWidgets import QApplication, QMainWindow
 
 projects_dir = 'todoPyQt\projects'
 
@@ -17,6 +19,14 @@ projects_dir = 'todoPyQt\projects'
 qt_creator_file = "mainwindow.ui" # stored in same directory
 Ui_MainWindow, QtBaseClass = uic.loadUiType(qt_creator_file) # load
 tick = QtGui.QImage('tick.png') # checkmark png
+
+def load_custom_font(font_path):
+    font_id = QFontDatabase.addApplicationFont(font_path)
+    if font_id == -1:
+        print("Failed to load font.")
+        return None
+    font_family = QFontDatabase.applicationFontFamilies(font_id)
+    return font_family[0] if font_family else None
 
 
 class TodoModel(QtCore.QAbstractListModel):
@@ -68,8 +78,20 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.previousProjectButton.pressed.connect(self.previous_project)
 
         # styling
-        with open('stylesheet.qss', 'r') as f:
-            self.setStyleSheet(f.read())
+        # with open('stylesheet.qss', 'r') as f:
+        #     self.setStyleSheet(f.read())
+
+        custom_font_path = './fonts/HyperjumpBold.ttf'  # Replace with the path to your custom font file
+        custom_font_family = load_custom_font(custom_font_path)
+        
+        if custom_font_family:
+            print(f"Loaded custom font: {custom_font_family}")
+            
+            # Apply the stylesheet
+            with open('stylesheet.qss', 'r') as file:  # Replace with the path to your .qss file
+                stylesheet = file.read()
+                stylesheet = stylesheet.replace("Arial, sans-serif", f'"{custom_font_family}", sans-serif')
+                app.setStyleSheet(stylesheet)
 
     # key events
     def keyPressEvent(self, event):
@@ -85,13 +107,18 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         modifiers = QtWidgets.QApplication.keyboardModifiers()
         if event.key() == QtCore.Qt.Key_W and modifiers == QtCore.Qt.ControlModifier:
             self.move_up()
+            self.todoView.setCurrentIndex(self.todoView.selectedIndexes()[0])
         if event.key() == QtCore.Qt.Key_S and modifiers == QtCore.Qt.ControlModifier:
             self.move_down()
+            self.todoView.setCurrentIndex(self.todoView.selectedIndexes()[0])
 
         if event.key() == QtCore.Qt.Key_C and modifiers == QtCore.Qt.ControlModifier:
             self.complete()
 
-
+        # press escape to clear currently selected item
+        if event.key() == QtCore.Qt.Key_Escape:
+                self.todoView.clearSelection()
+        
 
     # add mouse events, draggable entries:
     def mousePressEvent(self, event):
@@ -143,15 +170,41 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         Add an item to our todo list, getting the text from the QLineEdit .todoEdit
         and then clearing it.
         """
-        text = self.todoEdit.text()
-        if text: # Don't add empty strings.
-            # Access the list via the model.
-            self.model.todos.append((0, False, text))
-            # Trigger refresh.        
-            self.model.layoutChanged.emit()
-            # Empty the input
-            self.todoEdit.setText("")
-            self.save()
+        # check if selected topic
+        if self.todoView.selectedIndexes():
+            print(f"Selected: {self.todoView.selectedIndexes()[0].row()}")
+            # get index of selected item
+            index = self.todoView.selectedIndexes()[0].row()
+            # get text
+            text = self.todoEdit.text()
+            if text: # Don't add empty strings.
+                # Access the list via the model.
+                # add item after selected item
+                temp = (0, False, "    " + text) # indent function breaks somehow, changing 0 to 1 also breaks
+                self.model.todos.insert(index + 1, temp) # inserts into list
+                # Trigger refresh.
+                self.model.layoutChanged.emit()
+                # Empty the input
+                self.todoEdit.setText("")
+                self.save()
+        else:
+            # add to end of list
+            text = self.todoEdit.text()
+            if text:
+                self.model.todos.append((0, False, text))
+                self.model.layoutChanged.emit()
+                self.todoEdit.setText("")
+                self.save()
+
+        # text = self.todoEdit.text()
+        # if text: # Don't add empty strings.
+        #     # Access the list via the model.
+        #     self.model.todos.append((0, False, text))
+        #     # Trigger refresh.        
+        #     self.model.layoutChanged.emit()
+        #     # Empty the input
+        #     self.todoEdit.setText("")
+        #     self.save()
         
     def delete(self):
         indexes = self.todoView.selectedIndexes()
@@ -207,6 +260,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         try:
             files = os.listdir('./projects')
             self.files = files
+            # print(files)
             # setup index for current project
             if self.current_project:
                 self.current_project_index = files.index(self.current_project)
@@ -215,42 +269,48 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                 self.current_project_index = 0
         except Exception:
             pass
-        
+        print(f"Successfulyy loaded {len(self.files)} projects...")
         # load project
         self.load_project(self.current_project_index)
 
     def load_project(self, project_index):
         # load project
-        with open(f'projects/{self.files[project_index]}', 'r') as f:
-            data = json.load(f)
-            self.model.todos = data
-            self.model.layoutChanged.emit()
-            self.titleLabel.setText(self.current_project)
-            print(f"Loading project {self.files[project_index]}")
+        print(f"Attempting to load project {self.files[project_index]}...")
+        try:
+            with open(f'projects/{self.files[project_index]}', 'r') as f:
+                data = json.load(f)
+        except json.JSONDecodeError:
+            data = []
+
+        print(f"Successfully loaded project {self.files[project_index]}...")
+        self.model.todos = data
+        self.model.layoutChanged.emit()
+        self.titleLabel.setText(self.current_project)
 
     def next_project(self):
+        self.save()
         self.current_project_index += 1
         if self.current_project_index >= len(self.files):
             self.current_project_index = 0
         self.current_project = self.files[self.current_project_index]
         self.load_project(self.current_project_index)
-        self.save()
+
 
     def previous_project(self):
+        self.save()
         self.current_project_index -= 1
         if self.current_project_index < 0:
             self.current_project_index = len(self.files) - 1
         self.current_project = self.files[self.current_project_index]
         self.load_project(self.current_project_index)   
-        self.save()
+
     
     def save(self):
-        print(self.current_project)
-        # save to current file loaded:
+        print(f"Saving project {self.files[self.current_project_index]}...")
         with open(f'projects/{self.files[self.current_project_index]}', 'w') as f:
             data = json.dump(self.model.todos, f)
         # update config.json:
-        print("Saving config...")
+        # print("Saving config...")
         try:    
             with open('config.json', 'w') as config_file:
                 self.config['current_project'] = self.current_project

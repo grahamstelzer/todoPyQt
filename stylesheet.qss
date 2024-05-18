@@ -1,33 +1,33 @@
 /* Global styles */
 * {
     font-family: Arial, sans-serif;
-    font-size: 14px;
+    font-size: 20px;
 }
 
 QWidget {
-    background-color: white;
-    color: black;
+    background-color: #333333; /* dark grey */
+    color: white;
 }
 
 QPushButton {
-    background-color: black;
-    color: white;
+    background-color: #333333; /* dark grey */
+    color: cyan;
     border: none;
     padding: 5px 10px;
 }
 
 QListView {
-    background-color: white;
-    color: black;
+    background-color: #333333; /* dark grey */
+    color: white;
 }
 
 QLineEdit {
-    background-color: black;
-    color: white;
+    background-color: #333333; /* dark grey */
+    color: cyan;
     padding: 5px;
 }
 
 QMenuBar {
-    background-color: black;
-    color: white;
+    background-color: #333333; /* dark grey */
+    color: cyan;
 }

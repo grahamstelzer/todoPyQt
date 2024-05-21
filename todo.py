@@ -172,7 +172,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         """
         # check if selected topic
         if self.todoView.selectedIndexes():
-            print(f"Selected: {self.todoView.selectedIndexes()[0].row()}")
+            # print(f"Selected: {self.todoView.selectedIndexes()[0].row()}")
             # get index of selected item
             index = self.todoView.selectedIndexes()[0].row()
             # get text
